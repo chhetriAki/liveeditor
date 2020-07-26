@@ -18,8 +18,6 @@ function App() {
   return (
     <div className={classes.app_root}>
       <Header />
-      <CustomEditor/>
-      <CustomEditor/>
       <Footer/>
     </div>
   );

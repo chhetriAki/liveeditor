@@ -1,6 +1,11 @@
 import React, {useState} from "react";
+import {BrowserRouter as Router, Route, Link, Redirect} from 'react-router-dom';
+
 import { makeStyles } from "@material-ui/core/styles";
 import classNames from 'classnames'
+
+import Home from './Home'
+import SharedEditor from './SharedEditor'
 
 const useStyles = makeStyles( theme => ({
   root: {
@@ -72,6 +77,10 @@ const useStyles = makeStyles( theme => ({
   active: {
     backgroundColor: "#b22222",
     color: "#fff"
+  },
+  anchorStyle: {
+    textDecoration: "none",
+    color: "rgba(255,255,255,0.8)"
   }
 }));
 
@@ -80,18 +89,24 @@ const Header = (props) => {
   const [responsiveClass, addResponsiveClass] = useState(false)
 
   return (
-    <div className={responsiveClass ? classNames(classes.root, classes.nav_root_responsive):classes.root}>
-      <div className={classes.title}>Shared Editor</div>
-      <div className={responsiveClass ? classNames(classes.nav_wrapper, classes.nav_wrapper_responsive): classes.nav_wrapper}>
-        <div className={classNames(classes.nav_item)} onClick={()=>addResponsiveClass(!responsiveClass)}>News</div>
-        <div className={classes.nav_item} onClick={()=>addResponsiveClass(!responsiveClass)}>Contact</div>
-        <div className={classes.nav_item} onClick={()=>addResponsiveClass(!responsiveClass)}>About</div>
-      </div>      
-      <div className={classes.icon} onClick={()=>addResponsiveClass(!responsiveClass)}>
-          <i className="fa fa-bars"></i>
-        </div>
-    </div>
-  );
+    <Router>
+       <div className={responsiveClass ? classNames(classes.root, classes.nav_root_responsive):classes.root}>
+       <Link to="/" className={classes.anchorStyle}><div className={classes.title}>Shared Editor</div></Link>
+        <div className={responsiveClass ? classNames(classes.nav_wrapper, classes.nav_wrapper_responsive): classes.nav_wrapper}>
+        <Link to="/editor" className={classes.anchorStyle}><div className={classNames(classes.nav_item)} onClick={()=>responsiveClass && addResponsiveClass(!responsiveClass)}>Launch Editor</div></Link>
+          {/* <div className={classes.nav_item} onClick={()=>responsiveClass && addResponsiveClass(!responsiveClass)}>Contact</div>
+          <div className={classes.nav_item} onClick={()=>responsiveClass && addResponsiveClass(!responsiveClass)}>About</div> */}
+        </div>      
+        <div className={classes.icon} onClick={()=>addResponsiveClass(!responsiveClass)}>
+            <i className="fa fa-bars"></i>
+          </div>
+      </div>
+      
+      <Route path='/' exact component={Home}/>
+      <Route path='/editor' exact render={() => <Redirect to={ `/editor/${Date.now()}`}/> }/>
+      <Route path='/editor/:id' exact component={SharedEditor}/>     
+    </Router>    
+  )
 };
 
 export default Header;

@@ -1,21 +1,18 @@
 import React, { useEffect, useMemo, useState,useRef } from "react";
 import { createEditor } from "slate";
 import { Slate, Editable, withReact } from "slate-react";
-import Mitt from "mitt";
 import { makeStyles } from "@material-ui/core/styles";
-
+import useSocketIOClient from './groups/useSocketIOClient'
 const useStyles = makeStyles({
   root: {
     display: "grid",
-    backgroundColor: "#000",
     padding: "7px 5px",
-    color: "#fff",
+    color: "#000",
     fontSize: "12px",
-    border: "1px solid red",
+    height: "100%"
   },
 });
 
-const emittor = new Mitt();
 
 const CustomEditor = (props) => {
   const classes = useStyles();
@@ -29,19 +26,31 @@ const CustomEditor = (props) => {
     },
   ]);
 
+  const socket = useSocketIOClient()
+
   useEffect(() => {
-    emittor.on("*", (type, value) => {
-      if (editorInstanceId.current !== type) {
-        isRemoteEditorChange.current = true;
-        setValue(value);
-        isRemoteEditorChange.current = false;
-      }
-    });
-  }, []);
+    if (socket) {
+      socket.on(`onEditorValueUpdate-${props.sharedEditorId}`, ({editorId, value}) => {
+        if (editorInstanceId.current !== editorId) {
+            isRemoteEditorChange.current = true;
+            setValue(JSON.parse(value));
+            isRemoteEditorChange.current = false;
+          }
+      });
+    }
+    
+    return () => {
+        socket && socket.off(`onEditorValueUpdate-${props.sharedEditorId}`)
+    }
+  }, [socket]);
 
   function onValueChange(value) {
     if (!isRemoteEditorChange.current) {
-      emittor.emit(editorInstanceId.current, value);
+      socket.emit("onEditorValueChange", {
+        editorId: editorInstanceId.current,
+        value: JSON.stringify(value),
+        sharedEditorId: props.sharedEditorId
+      });
       setValue(value);
     }
   }
