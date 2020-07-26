@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import Header from './components/Header'
 import Footer from './components/Footer'
-
+import CustomEditor from './components/CustomEditor'
 const useStyles = makeStyles({
   app_root: {
    display: "grid",
@@ -18,7 +18,8 @@ function App() {
   return (
     <div className={classes.app_root}>
       <Header />
-      <div>Body</div>
+      <CustomEditor/>
+      <CustomEditor/>
       <Footer/>
     </div>
   );
